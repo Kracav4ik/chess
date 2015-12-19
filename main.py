@@ -3,6 +3,8 @@ from __future__ import division
 
 import pygame
 import sys
+from grid import Grid
+from screen import Screen
 
 
 WINDOW_SIZE = (1280, 720)  # размер окна в пикселах
@@ -12,6 +14,9 @@ WINDOW_BG_COLOR = (150, 50, 250)  # цвет окна
 pygame.init()
 
 window_surface = pygame.display.set_mode(WINDOW_SIZE)
+screen = Screen(window_surface)
+
+grid = Grid(300, 20, 680)
 
 
 def handle_input():
@@ -32,6 +37,8 @@ def render():
     """
     main_screen = pygame.display.get_surface()
     main_screen.fill(WINDOW_BG_COLOR)  # Закрашиваем фон
+
+    grid.render(screen)
 
     pygame.display.flip()  # Переключаем буфер
 
