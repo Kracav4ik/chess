@@ -7,7 +7,7 @@ from grid import Grid
 from screen import Screen
 
 
-WINDOW_SIZE = (1280, 720)  # размер окна в пикселах
+WINDOW_SIZE = (740, 740)  # размер окна в пикселах
 WINDOW_BG_COLOR = (150, 50, 250)  # цвет окна
 
 # инициализация
@@ -16,7 +16,7 @@ pygame.init()
 window_surface = pygame.display.set_mode(WINDOW_SIZE)
 screen = Screen(window_surface)
 
-grid = Grid(300, 20, 680)
+grid = Grid(10, 10, 720, 20, 20, 80)
 
 
 def handle_input():
