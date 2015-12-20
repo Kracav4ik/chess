@@ -29,6 +29,7 @@ class Grid:
         self.active_piece = None
         self.mouse_pos = (0, 0)
         self.active_shift = (0, 0)
+        self.is_whites_turn = True
 
         for x in range(CHESS_GRID):
             self.place_mirrored(PAWN, x, 1)
@@ -39,6 +40,7 @@ class Grid:
             self.place_mirrored(kind, CHESS_GRID - 1 - x, 0)
 
         self.bg_texture = pygame.image.load(os.path.join('data', 'chessboard.png'))
+        self.font = pygame.font.SysFont('Arial Black', 20)
 
     def place_mirrored(self, kind, black_x, black_y):
         self.pieces.append(ChessPiece(kind, black_x, black_y, False))
@@ -50,6 +52,15 @@ class Grid:
         """
         # Рисуем фон
         screen.draw_texture(self.bg_texture, self.bg_x, self.bg_y, self.bg_size, self.bg_size)
+
+        # Рисуем чей ход
+        if self.is_whites_turn:
+            text = "White's turn"
+            color = [255, 255, 255]
+        else:
+            text = "Black's turn"
+            color = [0, 0, 0]
+        screen.draw_text(text, self.font, color, self.bg_x, self.bg_y, self.bg_size, self.offset_y)
 
         # Рисуем фигуры на доске
         for piece in self.pieces:
@@ -114,8 +125,9 @@ class Grid:
         mouse_piece = self.get_piece(x, y)
         if not self.active_piece:
             # берем фигуру
-            self.active_piece = mouse_piece
-            self.active_shift = [x * self.cell_size - pos_x, y * self.cell_size - pos_y]
+            if mouse_piece and mouse_piece.is_white == self.is_whites_turn:
+                self.active_piece = mouse_piece
+                self.active_shift = [x * self.cell_size - pos_x, y * self.cell_size - pos_y]
         else:
             # ставим фигуру
             if mouse_piece == self.active_piece:
@@ -126,14 +138,19 @@ class Grid:
                 if mouse_piece and mouse_piece.is_white != self.active_piece.is_white and self.active_piece.can_attack(x, y):
                     # двигаем в клетку, занятую фигурой
                     self.pieces.remove(mouse_piece)
-                    self.active_piece.x = x
-                    self.active_piece.y = y
-                    self.active_piece = None
+                    self.place_active_piece_at(x, y)
                 elif not mouse_piece and self.active_piece.can_move(x, y):
                     # двигаем в пустую клетку
-                    self.active_piece.x = x
-                    self.active_piece.y = y
-                    self.active_piece = None
+                    self.place_active_piece_at(x, y)
+
+    def place_active_piece_at(self, x, y):
+        """Стави фигуру в ячейку и завершает ход
+        x, y - ячейковые коор-ты
+        """
+        self.active_piece.x = x
+        self.active_piece.y = y
+        self.active_piece = None
+        self.is_whites_turn = not self.is_whites_turn
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет

@@ -69,6 +69,7 @@ class ChessPiece:
             return abs(self.x - x) == abs(self.y - y) or self.x == x or self.y == y
         else:
             # Король
+            # TODO сделать рокировки
             return abs(self.x - x) <= 1 and abs(self.y - y) <= 1
 
     def can_attack(self, x, y):
