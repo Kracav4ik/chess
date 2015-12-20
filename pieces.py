@@ -70,3 +70,17 @@ class ChessPiece:
         else:
             # Король
             return abs(self.x - x) <= 1 and abs(self.y - y) <= 1
+
+    def can_attack(self, x, y):
+        """Возвращает True, если фигура может атаковать данную ячейку
+        х, у - Координата ячейки
+        """
+        if self.kind == PAWN:
+            # Пешка
+            if self.is_white:
+                return self.y == y + 1 and abs(self.x - x) == 1
+            else:
+                return self.y == y - 1 and abs(self.x - x) == 1
+            # TODO сделать взятие на проходе
+        else:
+            return self.can_move(x, y)

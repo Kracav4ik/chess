@@ -113,26 +113,24 @@ class Grid:
         x, y = self.pixels_to_grid(pos)
         mouse_piece = self.get_piece(x, y)
         if not self.active_piece:
+            # берем фигуру
             self.active_piece = mouse_piece
             self.active_shift = [x * self.cell_size - pos_x, y * self.cell_size - pos_y]
-        elif mouse_piece == self.active_piece or self.good_coords(x, y) and not mouse_piece and self.active_piece.can_move(x, y):
-            self.active_piece.x = x
-            self.active_piece.y = y
-            self.active_piece = None
-            ''' Как должно быть:
-            # оставляем фигуру на месте
-            mouse_piece == self.active_piece \
-            or \
-            # двигаем фигуру по правилам
-            self.good_coords(x, y) and \
-            (
-                # двигаем в пустую клетку
-                not mouse_piece and self.active_piece.can_move(x, y)
-                or
-                # двигаем в клетку, занятую фигурой
-                mouse_piece and mouse_piece.is_white != self.active_piece.is_white and self.active_piece.can_attack(x, y)
-             )
-             '''
+        else:
+            # ставим фигуру
+            if mouse_piece == self.active_piece:
+                # оставляем фигуру на своем месте
+                self.active_piece = None
+            elif self.good_coords(x, y):
+                # нажатие было внутри игрового поля
+                if mouse_piece and mouse_piece.is_white != self.active_piece.is_white and self.active_piece.can_attack(x, y):
+                    # двигаем в клетку, занятую фигурой
+                    print 'attack!'
+                elif not mouse_piece and self.active_piece.can_move(x, y):
+                    # двигаем в пустую клетку
+                    self.active_piece.x = x
+                    self.active_piece.y = y
+                    self.active_piece = None
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет
