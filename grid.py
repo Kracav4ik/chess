@@ -27,6 +27,7 @@ class Grid:
         self.active_cell = (0, 0)
         self.pieces = []
         self.active_piece = None
+        self.mouse_pos = (0, 0)
         self.active_shift = (0, 0)
 
         for x in range(CHESS_GRID):
@@ -55,9 +56,7 @@ class Grid:
             pix_x = self.offset_x + self.bg_x + piece.x * self.cell_size
             pix_y = self.offset_y + self.bg_y + piece.y * self.cell_size
             if piece == self.active_piece:
-                shift_x, shift_y = self.active_shift
-                pix_x += shift_x
-                pix_y += shift_y
+                continue
             piece.render_at(screen, pix_x, pix_y, self.cell_size)
 
         # Рисуем рамку поверх активной ячейки
@@ -66,18 +65,23 @@ class Grid:
         bg_y = y * self.cell_size + self.offset_y + self.bg_y
         screen.draw_frame(HOVER_COLOR, bg_x, bg_y, self.cell_size, self.cell_size, 2)
 
-    def mouse_moved(self, pos, rel):
+        # Рисуем активную фигуру
+        if self.active_piece:
+            mouse_x, mouse_y = self.mouse_pos
+            shift_x, shift_y = self.active_shift
+            pix_x = self.offset_x + self.bg_x + mouse_x + shift_x
+            pix_y = self.offset_y + self.bg_y + mouse_y + shift_y
+            self.active_piece.render_at(screen, pix_x, pix_y, self.cell_size)
+
+    def mouse_moved(self, pos):
         """Вызывается при движении мыши
         pos - координаты, список из двух чисел
-        rel - смещение относительно предыдущих коор-т мыши
         """
+        self.mouse_pos = pos
         x, y = self.pixels_to_grid(pos)
         if not self.good_coords(x, y):
             return
         self.active_cell = (x, y)
-        rel_x, rel_y = rel
-        shift_x, shift_y = self.active_shift
-        self.active_shift = [rel_x + shift_x, rel_y + shift_y]
 
     def convert_to_local(self, pos):
         """Получаем на вход пиксельные коор-ты относительно окна,
@@ -105,9 +109,10 @@ class Grid:
         """Вызывается при нажатии левой кнопки мыши
         pos - координаты, список из двух чисел
         """
+        pos_x, pos_y = pos
         x, y = self.pixels_to_grid(pos)
         self.active_piece = self.get_piece(x, y)
-        self.active_shift = [0, 0]
+        self.active_shift = [x * self.cell_size - pos_x, y * self.cell_size - pos_y]
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет
