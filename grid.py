@@ -111,8 +111,14 @@ class Grid:
         """
         pos_x, pos_y = pos
         x, y = self.pixels_to_grid(pos)
-        self.active_piece = self.get_piece(x, y)
-        self.active_shift = [x * self.cell_size - pos_x, y * self.cell_size - pos_y]
+        mouse_piece = self.get_piece(x, y)
+        if not self.active_piece:
+            self.active_piece = mouse_piece
+            self.active_shift = [x * self.cell_size - pos_x, y * self.cell_size - pos_y]
+        elif (not mouse_piece or mouse_piece == self.active_piece) and self.good_coords(x, y):
+            self.active_piece.x = x
+            self.active_piece.y = y
+            self.active_piece = None
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет
