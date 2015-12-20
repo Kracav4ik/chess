@@ -115,10 +115,24 @@ class Grid:
         if not self.active_piece:
             self.active_piece = mouse_piece
             self.active_shift = [x * self.cell_size - pos_x, y * self.cell_size - pos_y]
-        elif (not mouse_piece or mouse_piece == self.active_piece) and self.good_coords(x, y):
+        elif mouse_piece == self.active_piece or self.good_coords(x, y) and not mouse_piece and self.active_piece.can_move(x, y):
             self.active_piece.x = x
             self.active_piece.y = y
             self.active_piece = None
+            ''' Как должно быть:
+            # оставляем фигуру на месте
+            mouse_piece == self.active_piece \
+            or \
+            # двигаем фигуру по правилам
+            self.good_coords(x, y) and \
+            (
+                # двигаем в пустую клетку
+                not mouse_piece and self.active_piece.can_move(x, y)
+                or
+                # двигаем в клетку, занятую фигурой
+                mouse_piece and mouse_piece.is_white != self.active_piece.is_white and self.active_piece.can_attack(x, y)
+             )
+             '''
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет

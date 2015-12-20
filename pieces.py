@@ -44,3 +44,29 @@ class ChessPiece:
         text_color = [0, 0, 0] if self.is_white else [255, 255, 255]
         screen.draw_rect(color, pix_x + 2, pix_y + 2, pix_size - 4, pix_size - 4)
         screen.draw_text(TEXT[self.kind], self.font, text_color, pix_x, pix_y, pix_size, pix_size)
+
+    def can_move(self, x, y):
+        """Возвращает True, если фигуру можно переместить в эту пустую ячейку
+        x, y - Координата ячейки
+        """
+        if self.kind == PAWN:
+            # Пешка
+            if self.is_white:
+                return (self.y == y + 1 or self.y == 6 and self.y == y + 2) and self.x == x
+            else:
+                return (self.y == y - 1 or self.y == 1 and self.y == y - 2) and self.x == x
+        elif self.kind == KNIGHT:
+            # Конь
+            return abs(self.x - x) == 1 and abs(self.y - y) == 2 or abs(self.x - x) == 2 and abs(self.y - y) == 1
+        elif self.kind == BISHOP:
+            # Слон
+            return abs(self.x - x) == abs(self.y - y)
+        elif self.kind == ROOK:
+            # Ладья
+            return self.x == x or self.y == y
+        elif self.kind == QUEEN:
+            # Ферзь
+            return abs(self.x - x) == abs(self.y - y) or self.x == x or self.y == y
+        else:
+            # Король
+            return abs(self.x - x) <= 1 and abs(self.y - y) <= 1
