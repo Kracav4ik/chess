@@ -26,6 +26,8 @@ class Grid:
         self.cell_size = cell_size
         self.active_cell = (0, 0)
         self.pieces = []
+        self.active_piece = None
+        self.active_shift = (0, 0)
 
         for x in range(CHESS_GRID):
             self.place_mirrored(PAWN, x, 1)
@@ -52,6 +54,10 @@ class Grid:
         for piece in self.pieces:
             pix_x = self.offset_x + self.bg_x + piece.x * self.cell_size
             pix_y = self.offset_y + self.bg_y + piece.y * self.cell_size
+            if piece == self.active_piece:
+                shift_x, shift_y = self.active_shift
+                pix_x += shift_x
+                pix_y += shift_y
             piece.render_at(screen, pix_x, pix_y, self.cell_size)
 
         # Рисуем рамку поверх активной ячейки
@@ -60,13 +66,18 @@ class Grid:
         bg_y = y * self.cell_size + self.offset_y + self.bg_y
         screen.draw_frame(HOVER_COLOR, bg_x, bg_y, self.cell_size, self.cell_size, 2)
 
-    def cell_hover(self, pos):
-        """Активирует клетку, на которую наведён курсор мыши
+    def mouse_moved(self, pos, rel):
+        """Вызывается при движении мыши
+        pos - координаты, список из двух чисел
+        rel - смещение относительно предыдущих коор-т мыши
         """
         x, y = self.pixels_to_grid(pos)
         if not self.good_coords(x, y):
             return
         self.active_cell = (x, y)
+        rel_x, rel_y = rel
+        shift_x, shift_y = self.active_shift
+        self.active_shift = [rel_x + shift_x, rel_y + shift_y]
 
     def convert_to_local(self, pos):
         """Получаем на вход пиксельные коор-ты относительно окна,
@@ -89,3 +100,19 @@ class Grid:
         """Возвращает True, если коор-ты х, у принадлежат ячейкам
         """
         return 0 <= x < CHESS_GRID and 0 <= y < CHESS_GRID
+
+    def mouse_press(self, pos):
+        """Вызывается при нажатии левой кнопки мыши
+        pos - координаты, список из двух чисел
+        """
+        x, y = self.pixels_to_grid(pos)
+        self.active_piece = self.get_piece(x, y)
+        self.active_shift = [0, 0]
+
+    def get_piece(self, x, y):
+        """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет
+        x, y - ячейковые коор-ты
+        """
+        for piece in self.pieces:
+            if x == piece.x and y == piece.y:
+                return piece

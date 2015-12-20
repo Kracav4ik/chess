@@ -28,7 +28,11 @@ def handle_input():
             sys.exit()
         elif event.type == pygame.MOUSEMOTION:
             pos = grid.convert_to_local(event.pos)
-            grid.cell_hover(pos)
+            grid.mouse_moved(pos, event.rel)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            pos = grid.convert_to_local(event.pos)
+            if event.button == 1:  # left mouse button
+                grid.mouse_press(pos)
 
 
 def process_game():
