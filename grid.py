@@ -3,6 +3,7 @@
 from __future__ import division
 import os.path
 import pygame
+from pieces import ChessPiece, KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN
 
 HOVER_COLOR = [255, 255, 255]
 CHESS_GRID = 8
@@ -24,14 +25,34 @@ class Grid:
         self.offset_y = offset_y
         self.cell_size = cell_size
         self.active_cell = (0, 0)
+        self.pieces = []
+
+        for x in range(CHESS_GRID):
+            self.place_mirrored(PAWN, x, 1)
+        self.place_mirrored(KING, 4, 0)
+        self.place_mirrored(QUEEN, 3, 0)
+        for x, kind in enumerate([ROOK, KNIGHT, BISHOP]):
+            self.place_mirrored(kind, x, 0)
+            self.place_mirrored(kind, CHESS_GRID - 1 - x, 0)
 
         self.bg_texture = pygame.image.load(os.path.join('data', 'chessboard.png'))
+
+    def place_mirrored(self, kind, black_x, black_y):
+        self.pieces.append(ChessPiece(kind, black_x, black_y, False))
+        self.pieces.append(ChessPiece(kind, black_x, CHESS_GRID - 1 - black_y, True))
 
     def render(self, screen):
         """ Отрисовка игрового поля
         :type screen: screen.Screen
         """
+        # Рисуем фон
         screen.draw_texture(self.bg_texture, self.bg_x, self.bg_y, self.bg_size, self.bg_size)
+
+        # Рисуем фигуры на доске
+        for piece in self.pieces:
+            pix_x = self.offset_x + self.bg_x + piece.x * self.cell_size
+            pix_y = self.offset_y + self.bg_y + piece.y * self.cell_size
+            piece.render_at(screen, pix_x, pix_y, self.cell_size)
 
         # Рисуем рамку поверх активной ячейки
         x, y = self.active_cell
