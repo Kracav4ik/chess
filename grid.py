@@ -125,7 +125,10 @@ class Grid:
                 # нажатие было внутри игрового поля
                 if mouse_piece and mouse_piece.is_white != self.active_piece.is_white and self.active_piece.can_attack(x, y):
                     # двигаем в клетку, занятую фигурой
-                    print 'attack!'
+                    self.pieces.remove(mouse_piece)
+                    self.active_piece.x = x
+                    self.active_piece.y = y
+                    self.active_piece = None
                 elif not mouse_piece and self.active_piece.can_move(x, y):
                     # двигаем в пустую клетку
                     self.active_piece.x = x
