@@ -16,7 +16,7 @@ pygame.init()
 window_surface = pygame.display.set_mode(WINDOW_SIZE)
 screen = Screen(window_surface)
 
-grid = Grid(10, 10, 720, 20, 20, 80)
+grid = Grid(10, 10, 720, 40, 40, 80)
 
 
 def handle_input():
@@ -26,6 +26,9 @@ def handle_input():
     for event in events:
         if event.type == pygame.QUIT:
             sys.exit()
+        elif event.type == pygame.MOUSEMOTION:
+            pos = grid.convert_to_local(event.pos)
+            grid.cell_hover(pos)
 
 
 def process_game():
