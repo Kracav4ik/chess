@@ -45,16 +45,20 @@ class ChessPiece:
         screen.draw_rect(color, pix_x + 2, pix_y + 2, pix_size - 4, pix_size - 4)
         screen.draw_text(TEXT[self.kind], self.font, text_color, pix_x, pix_y, pix_size, pix_size)
 
-    def can_move(self, x, y):
+    def can_move(self, x, y, grid):
         """Возвращает True, если фигуру можно переместить в эту пустую ячейку
         x, y - Координата ячейки
+        grid - Игровое поле
         """
         if self.kind == PAWN:
             # Пешка
-            if self.is_white:
-                return (self.y == y + 1 or self.y == 6 and self.y == y + 2) and self.x == x
+            if self.x == x:
+                if self.is_white:
+                    return self.y == y + 1 or self.y == 6 and not grid.get_piece(x, self.y - 1) and self.y - 2 == y
+                else:
+                    return self.y == y - 1 or self.y == 1 and not grid.get_piece(x, self.y + 1) and self.y + 2 == y
             else:
-                return (self.y == y - 1 or self.y == 1 and self.y == y - 2) and self.x == x
+                return False
         elif self.kind == KNIGHT:
             # Конь
             return abs(self.x - x) == 1 and abs(self.y - y) == 2 or abs(self.x - x) == 2 and abs(self.y - y) == 1
@@ -63,7 +67,18 @@ class ChessPiece:
             return abs(self.x - x) == abs(self.y - y)
         elif self.kind == ROOK:
             # Ладья
-            return self.x == x or self.y == y
+            if self.x == x:
+                step = 1 if self.y < y else -1
+                for cell_y in range(self.y + step, y, step):
+                    if grid.get_piece(x, cell_y):
+                        return False
+                return True
+            elif self.y == y:
+                step = 1 if self.x < x else -1
+                for cell_x in range(self.x + step, x, step):
+                    if grid.get_piece(cell_x, y):
+                        return False
+                return True
         elif self.kind == QUEEN:
             # Ферзь
             return abs(self.x - x) == abs(self.y - y) or self.x == x or self.y == y
@@ -72,9 +87,10 @@ class ChessPiece:
             # TODO сделать рокировки
             return abs(self.x - x) <= 1 and abs(self.y - y) <= 1
 
-    def can_attack(self, x, y):
+    def can_attack(self, x, y, grid):
         """Возвращает True, если фигура может атаковать данную ячейку
         х, у - Координата ячейки
+        grid - Игровое поле
         """
         if self.kind == PAWN:
             # Пешка
@@ -84,4 +100,4 @@ class ChessPiece:
                 return self.y == y - 1 and abs(self.x - x) == 1
             # TODO сделать взятие на проходе
         else:
-            return self.can_move(x, y)
+            return self.can_move(x, y, grid)
