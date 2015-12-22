@@ -19,12 +19,15 @@ class Screen:
 
     def draw_rect(self, color, pix_x, pix_y, pix_w, pix_h):
         """Рисуем закрашенный прямоугольник
-        color - Цвет, список из 3-х чисел 0..255
+        color - Цвет, список из 3-х или 4-х чисел 0..255 (R, G, B) или (R, G, B, A), A == 0
         pix_x, pix_y - координаты левого верхнего угла в пикселях
         pix_w - Ширина в пикселях
         pix_h - Высота в пикселях
         """
-        pygame.draw.rect(self.surface, color, (pix_x, pix_y, pix_w, pix_h))
+        # noinspection PyArgumentList
+        rect_surface = pygame.Surface((pix_w, pix_h), flags=pygame.SRCALPHA)
+        rect_surface.fill(color)
+        self.surface.blit(rect_surface, (pix_x, pix_y))
 
     def draw_text(self, text, font, color, pix_x, pix_y, pix_w, pix_h):
         """Рисуем текст так, чтобы центр нарисованного текста был в центре заданного прямоугольника

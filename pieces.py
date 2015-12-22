@@ -41,7 +41,7 @@ class ChessPiece:
         pix_x, pix_y - коор-ты левого верхнего угла в пикселах
         pix_size - Размер ячейки в пикселях
         """
-        color = [255, 255, 255] if self.is_white else [0, 0, 0]
+        color = [255, 255, 255, 168] if self.is_white else [0, 0, 0, 168]
         text_color = [0, 0, 0] if self.is_white else [255, 255, 255]
         pix_shift = (pix_size - PIECE_SIZE)/2
         screen.draw_rect(color, pix_x + pix_shift, pix_y + pix_shift, PIECE_SIZE, PIECE_SIZE)
