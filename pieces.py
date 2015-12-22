@@ -63,36 +63,17 @@ class ChessPiece:
             return abs(self.x - x) == 1 and abs(self.y - y) == 2 or abs(self.x - x) == 2 and abs(self.y - y) == 1
         elif self.kind == BISHOP:
             # Слон
-            if abs(self.x - x) == abs(self.y - y):
-                diff = abs(self.x - x)
-                dx = 1 if self.x < x else -1
-                dy = 1 if self.y < y else -1
-                for cell in range(1, diff):
-                    if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
-                        return False
-                return True
+            return self.can_move_bishop(x, y, grid)
         elif self.kind == ROOK:
             # Ладья
-            if self.x == x:
-                step = 1 if self.y < y else -1
-                for cell_y in range(self.y + step, y, step):
-                    if grid.get_piece(x, cell_y):
-                        return False
-                return True
-            elif self.y == y:
-                step = 1 if self.x < x else -1
-                for cell_x in range(self.x + step, x, step):
-                    if grid.get_piece(cell_x, y):
-                        return False
-                return True
+            return self.can_move_rook(x, y, grid)
         elif self.kind == QUEEN:
             # Ферзь
-            return abs(self.x - x) == abs(self.y - y) or self.x == x or self.y == y
+            return self.can_move_bishop(x, y, grid) or self.can_move_rook(x, y, grid)
         else:
             # Король
             # TODO сделать рокировки
             return abs(self.x - x) <= 1 and abs(self.y - y) <= 1
-        return False
 
     def can_attack(self, x, y, grid):
         """Возвращает True, если фигура может атаковать данную ячейку
@@ -106,3 +87,29 @@ class ChessPiece:
             # TODO сделать взятие на проходе
         else:
             return self.can_move(x, y, grid)
+
+    def can_move_bishop(self, x, y, grid):
+        if abs(self.x - x) == abs(self.y - y):
+            diff = abs(self.x - x)
+            dx = 1 if self.x < x else -1
+            dy = 1 if self.y < y else -1
+            for cell in range(1, diff):
+                if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
+                    return False
+            return True
+        return False
+
+    def can_move_rook(self, x, y, grid):
+        if self.x == x:
+            step = 1 if self.y < y else -1
+            for cell_y in range(self.y + step, y, step):
+                if grid.get_piece(x, cell_y):
+                    return False
+            return True
+        elif self.y == y:
+            step = 1 if self.x < x else -1
+            for cell_x in range(self.x + step, x, step):
+                if grid.get_piece(cell_x, y):
+                    return False
+            return True
+        return False
