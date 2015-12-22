@@ -93,10 +93,8 @@ class ChessPiece:
         """
         if self.kind == PAWN:
             # Пешка
-            if self.is_white:
-                return self.y == y + 1 and abs(self.x - x) == 1
-            else:
-                return self.y == y - 1 and abs(self.x - x) == 1
+            dy = -1 if self.is_white else 1
+            return self.y + dy == y and abs(self.x - x) == 1
             # TODO сделать взятие на проходе
         else:
             return self.can_move(x, y, grid)
