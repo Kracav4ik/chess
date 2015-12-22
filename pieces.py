@@ -115,3 +115,13 @@ class ChessPiece:
                     return False
             return True
         return False
+
+    def get_attacked_cells(self):
+        """Возвращает список атакуемых клеток
+        """
+        if self.kind == PAWN:
+            # Пешка
+            dy = -1 if self.is_white else 1
+            return [[self.x - 1, self.y + dy], [self.x + 1, self.y + dy]]
+        else:
+            return []

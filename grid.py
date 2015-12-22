@@ -33,6 +33,7 @@ class Grid:
         self.is_whites_turn = True
         self.attack_grid = AttackGrid(offset_x + bg_x, offset_y + bg_y, cell_size)
 
+        # Расставляем фигуры на доске
         for x in range(CHESS_GRID):
             self.place_mirrored(PAWN, x, 1)
         self.place_mirrored(KING, 4, 0)
@@ -40,6 +41,8 @@ class Grid:
         for x, kind in enumerate([ROOK, KNIGHT, BISHOP]):
             self.place_mirrored(kind, x, 0)
             self.place_mirrored(kind, CHESS_GRID - 1 - x, 0)
+
+        self.refresh_attack_cells()
 
         self.bg_texture = pygame.image.load(os.path.join('data', 'chessboard.png'))
         self.font = pygame.font.SysFont('Arial Black', 20)
@@ -56,7 +59,7 @@ class Grid:
         screen.draw_texture(self.bg_texture, self.bg_x, self.bg_y, self.bg_size, self.bg_size)
 
         # Рисуем атакованные поля
-        self.attack_grid.render(screen)
+        self.attack_grid.render(screen, self)
 
         # Рисуем чей ход
         if self.is_whites_turn:
@@ -149,13 +152,14 @@ class Grid:
                     self.place_active_piece_at(x, y)
 
     def place_active_piece_at(self, x, y):
-        """Стави фигуру в ячейку и завершает ход
+        """Ставит фигуру в ячейку и завершает ход
         x, y - ячейковые коор-ты
         """
         self.active_piece.x = x
         self.active_piece.y = y
         self.active_piece = None
         self.is_whites_turn = not self.is_whites_turn
+        self.refresh_attack_cells()
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет
@@ -164,3 +168,10 @@ class Grid:
         for piece in self.pieces:
             if x == piece.x and y == piece.y:
                 return piece
+
+    def refresh_attack_cells(self):
+        """Обновляет атакуемые клетки
+        """
+        self.attack_grid.reset_cells()
+        for piece in self.pieces:
+            self.attack_grid.add_cells(piece.get_attacked_cells())
