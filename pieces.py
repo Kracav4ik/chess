@@ -18,6 +18,7 @@ TEXT = {
     KNIGHT: 'N',
     PAWN: 'P',
 }
+PIECE_SIZE = 48
 
 
 class ChessPiece:
@@ -32,7 +33,7 @@ class ChessPiece:
         self.y = y
         self.is_white = is_white
 
-        self.font = pygame.font.SysFont('Arial', 70)
+        self.font = pygame.font.SysFont('Arial', 46)
 
     def render_at(self, screen, pix_x, pix_y, pix_size):
         """Рисует фигуру в указанной ячейке
@@ -42,7 +43,8 @@ class ChessPiece:
         """
         color = [255, 255, 255] if self.is_white else [0, 0, 0]
         text_color = [0, 0, 0] if self.is_white else [255, 255, 255]
-        screen.draw_rect(color, pix_x + 2, pix_y + 2, pix_size - 4, pix_size - 4)
+        pix_shift = (pix_size - PIECE_SIZE)/2
+        screen.draw_rect(color, pix_x + pix_shift, pix_y + pix_shift, PIECE_SIZE, PIECE_SIZE)
         screen.draw_text(TEXT[self.kind], self.font, text_color, pix_x, pix_y, pix_size, pix_size)
 
     def can_move(self, x, y, grid):
