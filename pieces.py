@@ -63,7 +63,14 @@ class ChessPiece:
             return abs(self.x - x) == 1 and abs(self.y - y) == 2 or abs(self.x - x) == 2 and abs(self.y - y) == 1
         elif self.kind == BISHOP:
             # Слон
-            return abs(self.x - x) == abs(self.y - y)
+            if abs(self.x - x) == abs(self.y - y):
+                diff = abs(self.x - x)
+                dx = 1 if self.x < x else -1
+                dy = 1 if self.y < y else -1
+                for cell in range(1, diff):
+                    if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
+                        return False
+                return True
         elif self.kind == ROOK:
             # Ладья
             if self.x == x:
@@ -85,6 +92,7 @@ class ChessPiece:
             # Король
             # TODO сделать рокировки
             return abs(self.x - x) <= 1 and abs(self.y - y) <= 1
+        return False
 
     def can_attack(self, x, y, grid):
         """Возвращает True, если фигура может атаковать данную ячейку
