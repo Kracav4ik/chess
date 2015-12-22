@@ -3,6 +3,7 @@
 from __future__ import division
 import os.path
 import pygame
+from attack import AttackGrid
 from pieces import ChessPiece, KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN
 
 HOVER_COLOR = [255, 255, 255]
@@ -30,6 +31,7 @@ class Grid:
         self.mouse_pos = (0, 0)
         self.active_shift = (0, 0)
         self.is_whites_turn = True
+        self.attack_grid = AttackGrid(offset_x + bg_x, offset_y + bg_y, cell_size)
 
         for x in range(CHESS_GRID):
             self.place_mirrored(PAWN, x, 1)
@@ -52,6 +54,9 @@ class Grid:
         """
         # Рисуем фон
         screen.draw_texture(self.bg_texture, self.bg_x, self.bg_y, self.bg_size, self.bg_size)
+
+        # Рисуем атакованные поля
+        self.attack_grid.render(screen)
 
         # Рисуем чей ход
         if self.is_whites_turn:
