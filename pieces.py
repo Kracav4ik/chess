@@ -53,10 +53,9 @@ class ChessPiece:
         if self.kind == PAWN:
             # Пешка
             if self.x == x:
-                if self.is_white:
-                    return self.y == y + 1 or self.y == 6 and not grid.get_piece(x, self.y - 1) and self.y - 2 == y
-                else:
-                    return self.y == y - 1 or self.y == 1 and not grid.get_piece(x, self.y + 1) and self.y + 2 == y
+                dy = -1 if self.is_white else 1
+                pawn_row = 6 if self.is_white else 1
+                return self.y + dy == y or self.y == pawn_row and not grid.get_piece(x, self.y + dy) and self.y + 2 * dy == y
             else:
                 return False
         elif self.kind == KNIGHT:
