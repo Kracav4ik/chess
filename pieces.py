@@ -124,15 +124,16 @@ class ChessPiece:
             return True
         return False
 
-    def trace_directions(self, direction, grid):
+    def trace_directions(self, direction, grid, length=7):
         """Идем вдоль направлений от фигуры и возвращаем все клетки до первой встреченной фигуры
         direction - список направлений, пар [dx, dy]
             dx, dy - Шаги по осям соответствующих направлений
         grid - Игровое поле
+        length - количество шагов по каждому из направлений
         """
         result = []
         for dx, dy in direction:
-            for cell in range(1, 8):
+            for cell in range(1, length + 1):
                 result.append([self.x + dx * cell, self.y + dy * cell])
                 if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
                     break
@@ -155,4 +156,8 @@ class ChessPiece:
         elif self.kind == ROOK:
             # Ладья
             result = self.trace_directions(hor_vert_moves, grid)
+        elif self.kind == QUEEN:
+            result = self.trace_directions(hor_vert_moves + diagonal_moves, grid)
+        elif self.kind == KING:
+            result = self.trace_directions(hor_vert_moves + diagonal_moves, grid, 1)
         return result
