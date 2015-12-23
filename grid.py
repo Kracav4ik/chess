@@ -48,6 +48,11 @@ class Grid:
         self.font = pygame.font.SysFont('Arial Black', 20)
 
     def place_mirrored(self, kind, black_x, black_y):
+        """Ставит черную фигуру в заданную ячейку, и зеркально ей ставит такую же белую фигуру.
+        Используется для расстановки фигур в начальной позиции.
+        kind - Тип фигуры (Ферзь, король и т.д)
+        black_x, black_y - Координаты ячейки для черной фигуры
+        """
         self.pieces.append(ChessPiece(kind, black_x, black_y, False))
         self.pieces.append(ChessPiece(kind, black_x, CHESS_GRID - 1 - black_y, True))
 

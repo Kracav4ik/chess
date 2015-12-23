@@ -91,6 +91,10 @@ class ChessPiece:
             return self.can_move(x, y, grid)
 
     def can_move_bishop(self, x, y, grid):
+        """Возвращае True если на пути слона к точке (х, у) нет фигур
+        х, у - Координата ячейки
+        grid - Игровое поле
+        """
         if abs(self.x - x) == abs(self.y - y):
             diff = abs(self.x - x)
             dx = 1 if self.x < x else -1
@@ -102,6 +106,10 @@ class ChessPiece:
         return False
 
     def can_move_rook(self, x, y, grid):
+        """Возвращае True если на пути ладьи к точке (х, у) нет фигур
+        х, у - Координата ячейки
+        grid - Игровое поле
+        """
         if self.x == x:
             step = 1 if self.y < y else -1
             for cell_y in range(self.y + step, y, step):
@@ -116,10 +124,26 @@ class ChessPiece:
             return True
         return False
 
+    def trace_directions(self, direction, grid):
+        """Идем вдоль направлений от фигуры и возвращаем все клетки до первой встреченной фигуры
+        direction - список направлений, пар [dx, dy]
+            dx, dy - Шаги по осям соответствующих направлений
+        grid - Игровое поле
+        """
+        result = []
+        for dx, dy in direction:
+            for cell in range(1, 8):
+                result.append([self.x + dx * cell, self.y + dy * cell])
+                if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
+                    break
+        return result
+
     def get_attacked_cells(self, grid):
         """Возвращает список атакуемых клеток
         grid - Игровое поле
         """
+        diagonal_moves = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
+        hor_vert_moves = [[-1, 0], [1, 0], [0, -1], [0, 1]]
         result = []
         if self.kind == PAWN:
             # Пешка
@@ -127,16 +151,8 @@ class ChessPiece:
             result = [[self.x - 1, self.y + dy], [self.x + 1, self.y + dy]]
         elif self.kind == BISHOP:
             # Слон
-            for dx, dy in [[-1, -1], [-1, 1], [1, -1], [1, 1]]:
-                for cell in range(1, 8):
-                    result.append([self.x + dx * cell, self.y + dy * cell])
-                    if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
-                        break
+            result = self.trace_directions(diagonal_moves, grid)
         elif self.kind == ROOK:
             # Ладья
-            for dx, dy in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
-                for cell in range(1, 8):
-                    result.append([self.x + dx * cell, self.y + dy * cell])
-                    if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
-                        break
+            result = self.trace_directions(hor_vert_moves, grid)
         return result
