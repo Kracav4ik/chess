@@ -144,6 +144,7 @@ class ChessPiece:
         grid - Игровое поле
         """
         diagonal_moves = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
+        knight_moves = [[2, 1], [1, 2], [-1, 2], [-2, 1], [-1, -2], [-2, -1], [1, -2], [2, -1]]
         hor_vert_moves = [[-1, 0], [1, 0], [0, -1], [0, 1]]
         result = []
         if self.kind == PAWN:
@@ -157,7 +158,12 @@ class ChessPiece:
             # Ладья
             result = self.trace_directions(hor_vert_moves, grid)
         elif self.kind == QUEEN:
+            # Ферзь
             result = self.trace_directions(hor_vert_moves + diagonal_moves, grid)
         elif self.kind == KING:
+            # Король
             result = self.trace_directions(hor_vert_moves + diagonal_moves, grid, 1)
+        elif self.kind == KNIGHT:
+            # Конь
+            result = self.trace_directions(knight_moves, grid, 1)
         return result
