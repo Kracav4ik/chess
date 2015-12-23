@@ -132,4 +132,11 @@ class ChessPiece:
                     result.append([self.x + dx * cell, self.y + dy * cell])
                     if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
                         break
+        elif self.kind == ROOK:
+            # Ладья
+            for dx, dy in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
+                for cell in range(1, 8):
+                    result.append([self.x + dx * cell, self.y + dy * cell])
+                    if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
+                        break
         return result
