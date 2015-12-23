@@ -116,12 +116,21 @@ class ChessPiece:
             return True
         return False
 
-    def get_attacked_cells(self):
+    def get_attacked_cells(self, grid):
         """Возвращает список атакуемых клеток
+        grid - Игровое поле
         """
+        result = []
         if self.kind == PAWN:
             # Пешка
             dy = -1 if self.is_white else 1
-            return [[self.x - 1, self.y + dy], [self.x + 1, self.y + dy]]
-        else:
-            return []
+            result = [[self.x - 1, self.y + dy], [self.x + 1, self.y + dy]]
+        elif self.kind == BISHOP:
+            # Слон
+            for dx, dy in [[-1, -1], [-1, 1], [1, -1], [1, 1]]:
+                for cell in range(1, 8):
+                    if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
+                        break
+                    else:
+                        result.append([self.x + dx * cell, self.y + dy * cell])
+        return result
