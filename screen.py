@@ -29,6 +29,33 @@ class Screen:
         rect_surface.fill(color)
         self.surface.blit(rect_surface, (pix_x, pix_y))
 
+    def draw_polygon(self, color, points_list):
+        """Рисуем закрашенный многоугольник
+        color - Цвет, список из 3-х или 4-х чисел 0..255 (R, G, B) или (R, G, B, A), A == 0
+        points_list - список вершин многоугольника
+        """
+        x_min, y_min = points_list[0]
+        x_max, y_max = x_min, y_min
+        for x, y in points_list:
+            if x_max < x:
+                x_max = x
+            if x_min > x:
+                x_min = x
+            if y_max < y:
+                y_max = y
+            if y_min > y:
+                y_min = y
+        width = x_max - x_min
+        height = y_max - y_min
+
+        surface_points = []
+        for x, y in points_list:
+            surface_points.append([x - x_min, y - y_min])
+
+        poly_surface = pygame.Surface((width, height), flags=pygame.SRCALPHA)
+        pygame.draw.polygon(poly_surface, color, surface_points)
+        self.surface.blit(poly_surface, (x_min, y_min))
+
     def draw_text(self, text, font, color, pix_x, pix_y, pix_w, pix_h):
         """Рисуем текст так, чтобы центр нарисованного текста был в центре заданного прямоугольника
         text - Текст

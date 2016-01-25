@@ -39,7 +39,22 @@ class AttackGrid:
             pix_y = y * self.cell_size + self.pix_y
             attacked_by_enemy = grid.is_whites_turn != is_white
             color = enemy_color if attacked_by_enemy else friend_color
-            screen.draw_rect(color, pix_x + 2, pix_y + 2, self.cell_size - 4, self.cell_size - 4)
+            gap = 4
+            border = 6
+            triangle_leg = self.cell_size - border
+            if is_white:
+                points = [
+                    (pix_x + border,             pix_y + border + gap),
+                    (pix_x + border,             pix_y + triangle_leg),
+                    (pix_x + triangle_leg - gap, pix_y + triangle_leg)
+                ]
+            else:
+                points = [
+                    (pix_x + border + gap, pix_y + border),
+                    (pix_x + triangle_leg, pix_y + border),
+                    (pix_x + triangle_leg, pix_y + triangle_leg - gap)
+                ]
+            screen.draw_polygon(color, points)
 
     def add_cells(self, cells, is_white):
         """Добавляет список коор-т ячеек к атакуемым ячейкам
