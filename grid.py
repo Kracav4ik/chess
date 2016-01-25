@@ -179,4 +179,4 @@ class Grid:
         """
         self.attack_grid.reset_cells()
         for piece in self.pieces:
-            self.attack_grid.add_cells(piece.get_attacked_cells(self))
+            self.attack_grid.add_cells(piece.get_attacked_cells(self), piece.is_white)
