@@ -75,6 +75,19 @@ class Grid:
             color = [0, 0, 0]
         screen.draw_text(text, self.font, color, self.bg_x, self.bg_y, self.bg_size, self.offset_y)
 
+        # Рисуем состояние королей
+        if self.king_under_attack(True):
+            white_king_state = 'White king is OK'
+        else:
+            white_king_state = 'White king under attack'
+        screen.draw_text(white_king_state, self.font, [255, 255, 255], self.bg_x, self.bg_y, 2 * self.bg_size // 5, self.offset_y)
+
+        if self.king_under_attack(False):
+            black_king_state = 'Black king is OK'
+        else:
+            black_king_state = 'Black king under attack'
+        screen.draw_text(black_king_state, self.font, [0, 0, 0], self.bg_x + 3 * self.bg_size // 5, self.bg_y, 2 * self.bg_size // 5, self.offset_y)
+
         # Рисуем фигуры на доске
         for piece in self.pieces:
             pix_x = self.offset_x + self.bg_x + piece.x * self.cell_size
@@ -180,3 +193,16 @@ class Grid:
         self.attack_grid.reset_cells()
         for piece in self.pieces:
             self.attack_grid.add_cells(piece.get_attacked_cells(self), piece.is_white)
+
+    def king_under_attack(self, is_white_king):
+        """Возвращает True если король белого или черного цвета атакован
+        is_white_king - рассматриваем белого или черного короля
+        """
+        king_figure = None
+        for piece in self.pieces:
+            if piece.is_white == is_white_king and piece.kind == KING:
+                king_figure = piece
+        for cell_info in self.attack_grid.attacked_cells:
+            if king_figure.x == cell_info.x and king_figure.y == cell_info.y and king_figure.is_white != cell_info.attacked_by_white:
+                return False
+        return True
