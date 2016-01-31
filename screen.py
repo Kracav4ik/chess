@@ -10,12 +10,23 @@ class Screen:
     """
     def __init__(self, surface):
         self.surface = surface
+        self.fonts = {}
 
     def get_size(self):
         """Размер области, на которой мы рисуем
         """
         width, height = self.surface.get_size()
         return width, height
+
+    def get_font(self, font_face, font_size):
+        """Возвращаем кешированный шрифт
+        font_face - название шрифта
+        font_size - размер шрифта
+        """
+        font_key = (font_face, font_size)
+        if font_key not in self.fonts:
+            self.fonts[font_key] = pygame.font.SysFont(font_face, font_size)
+        return self.fonts[font_key]
 
     def draw_rect(self, color, pix_x, pix_y, pix_w, pix_h):
         """Рисуем закрашенный прямоугольник

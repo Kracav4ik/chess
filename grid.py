@@ -82,7 +82,6 @@ class Grid:
         self.refresh_attack_cells()
 
         self.bg_texture = pygame.image.load(os.path.join('data', 'chessboard.png'))
-        self.font = pygame.font.SysFont('Arial Black', 20)
 
     def place_mirrored(self, kind, black_x, black_y):
         """Ставит черную фигуру в заданную ячейку, и зеркально ей ставит такую же белую фигуру.
@@ -114,20 +113,21 @@ class Grid:
             text = 'Checkmate'
         elif self.is_stalemate:
             text = 'Stalemate'
-        screen.draw_text(text, self.font, color, self.bg_x, self.bg_y, self.bg_size, self.offset_y)
+        font = screen.get_font('Arial Black', 20)
+        screen.draw_text(text, font, color, self.bg_x, self.bg_y, self.bg_size, self.offset_y)
 
         # Рисуем состояние королей
         if self.king_under_attack(self.pieces, self.attack_grid, True):
             white_king_state = 'White king under attack'
         else:
             white_king_state = 'White king is OK'
-        screen.draw_text(white_king_state, self.font, [255, 255, 255], self.bg_x, self.bg_y, 2 * self.bg_size // 5, self.offset_y)
+        screen.draw_text(white_king_state, font, [255, 255, 255], self.bg_x, self.bg_y, 2 * self.bg_size // 5, self.offset_y)
 
         if self.king_under_attack(self.pieces, self.attack_grid, False):
             black_king_state = 'Black king under attack'
         else:
             black_king_state = 'Black king is OK'
-        screen.draw_text(black_king_state, self.font, [0, 0, 0], self.bg_x + 3 * self.bg_size // 5, self.bg_y, 2 * self.bg_size // 5, self.offset_y)
+        screen.draw_text(black_king_state, font, [0, 0, 0], self.bg_x + 3 * self.bg_size // 5, self.bg_y, 2 * self.bg_size // 5, self.offset_y)
 
         # Рисуем фигуры на доске
         for piece in self.pieces:

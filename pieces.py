@@ -33,8 +33,6 @@ class ChessPiece:
         self.y = y
         self.is_white = is_white
 
-        self.font = pygame.font.SysFont('Arial', 46)
-
     def render_at(self, screen, pix_x, pix_y, pix_size):
         """Рисует фигуру в указанной ячейке
         screen - Экран
@@ -45,7 +43,8 @@ class ChessPiece:
         text_color = [0, 0, 0] if self.is_white else [255, 255, 255]
         pix_shift = (pix_size - PIECE_SIZE)/2
         screen.draw_rect(color, pix_x + pix_shift, pix_y + pix_shift, PIECE_SIZE, PIECE_SIZE)
-        screen.draw_text(TEXT[self.kind], self.font, text_color, pix_x, pix_y, pix_size, pix_size)
+        font = screen.get_font('Arial', 46)
+        screen.draw_text(TEXT[self.kind], font, text_color, pix_x, pix_y, pix_size, pix_size)
 
     def clone(self):
         """Создает идентичную копию фигуры

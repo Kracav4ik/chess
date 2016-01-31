@@ -20,11 +20,11 @@ class Button:
         self.text = text
         self.click = click_function
         self.color = (0, 0, 255)
-        self.font = pygame.font.SysFont('Arial', 30)
 
     def render(self, screen):
         screen.draw_rect(self.color, self.x, self.y, self.width, self.height)
-        screen.draw_text(self.text, self.font, (255, 170, 170), self.x, self.y, self.width, self.height)
+        font = screen.get_font('Arial', 30)
+        screen.draw_text(self.text, font, (255, 170, 170), self.x, self.y, self.width, self.height)
 
     def is_inside(self, pos):
         """Возвращает True, если точка pos находится внутри
