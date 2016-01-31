@@ -13,12 +13,12 @@ CHESS_GRID = 8
 class SimpleGrid:
     """Упрощенное игровое поле, которое используется для расчета следующей позиции
     """
-    def __init__(self, actual_grid):
+    def __init__(self, actual_grid, active_piece):
         """
         :type actual_grid: Grid
         """
         self.pieces = [piece.clone() for piece in actual_grid.pieces]
-        self.active_piece = self.get_piece(actual_grid.active_piece.x, actual_grid.active_piece.y)
+        self.active_piece = self.get_piece(active_piece.x, active_piece.y)
         self.attack_grid = SimpleAttackGrid()
 
     def get_piece(self, x, y):
@@ -67,6 +67,8 @@ class Grid:
         self.active_shift = (0, 0)
         self.is_whites_turn = True
         self.attack_grid = AttackGrid(offset_x + bg_x, offset_y + bg_y, cell_size)
+        self.is_checkmate = False
+        self.is_stalemate = False
 
         # Расставляем фигуры на доске
         for x in range(CHESS_GRID):
@@ -108,6 +110,10 @@ class Grid:
         else:
             text = "Black's turn"
             color = [0, 0, 0]
+        if self.is_checkmate:
+            text = 'Checkmate'
+        elif self.is_stalemate:
+            text = 'Stalemate'
         screen.draw_text(text, self.font, color, self.bg_x, self.bg_y, self.bg_size, self.offset_y)
 
         # Рисуем состояние королей
@@ -198,7 +204,7 @@ class Grid:
                 # нажатие было внутри игрового поля
 
                 # создаем фейковый грид чтобы проверить разрешенность хода
-                grid_copy = SimpleGrid(self)
+                grid_copy = SimpleGrid(self, self.active_piece)
 
                 if mouse_piece and mouse_piece.is_white != self.active_piece.is_white and self.active_piece.can_attack(x, y, self):
                     # двигаем в клетку, занятую фигурой
@@ -218,7 +224,49 @@ class Grid:
                     self.attack_grid.attacked_cells = grid_copy.attack_grid.attacked_cells
                     self.active_piece = None
                     self.is_whites_turn = not self.is_whites_turn
+                    self.check_game_end()
                     # TODO сделать превращение пешки при достижении последней горизонтали
+
+    def check_game_end(self):
+        if self.is_stalemate or self.is_checkmate:
+            return
+        if not self.can_move_any_piece(self.is_whites_turn):
+            # никакой ход невозможен
+            if self.king_under_attack(self.pieces, self.attack_grid, self.is_whites_turn):
+                # король под шахом - мат
+                self.is_checkmate = True
+            else:
+                # король не под шахом - пат
+                self.is_stalemate = True
+        # TODO сделать ничью из-за недостатка фигур (два короля и один слон/конь)
+
+    def can_move_any_piece(self, is_white):
+        for piece in self.pieces:
+            if piece.is_white == is_white:
+                cells_to_move_or_attack = piece.get_cells_to_move(self) + piece.get_attacked_cells(self)
+                for x, y in cells_to_move_or_attack:
+                    if self.good_coords(x, y):
+                        # нажатие было внутри игрового поля
+
+                        # создаем фейковый грид чтобы проверить разрешенность хода
+                        grid_copy = SimpleGrid(self, piece)
+
+                        mouse_piece = self.get_piece(x, y)
+                        if mouse_piece and mouse_piece.is_white != piece.is_white and piece.can_attack(x, y, self):
+                            # двигаем в клетку, занятую фигурой
+                            grid_copy.pieces.remove(grid_copy.get_piece(x, y))
+                            grid_copy.place_active_piece_at(x, y)
+                        elif not mouse_piece and piece.can_move(x, y, self):
+                            # двигаем в пустую клетку
+                            grid_copy.place_active_piece_at(x, y)
+                        else:
+                            # эта фигура не может так пойти
+                            continue
+
+                        # если ход не открывает короля под шах
+                        if not self.king_under_attack(grid_copy.pieces, grid_copy.attack_grid, self.is_whites_turn):
+                            return True
+        return False
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет
