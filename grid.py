@@ -218,6 +218,7 @@ class Grid:
                     self.attack_grid.attacked_cells = grid_copy.attack_grid.attacked_cells
                     self.active_piece = None
                     self.is_whites_turn = not self.is_whites_turn
+                    # TODO сделать превращение пешки при достижении последней горизонтали
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет

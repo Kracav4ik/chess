@@ -52,35 +52,32 @@ class ChessPiece:
         """
         return ChessPiece(self.kind, self.x, self.y, self.is_white)
 
+    def get_cells_to_move(self, grid):
+        if self.kind == PAWN:
+            # Пешка
+            dy = -1 if self.is_white else 1
+            pawn_row = 6 if self.is_white else 1
+            cells = [[self.x, self.y + dy]]
+            if self.y == pawn_row and not grid.get_piece(self.x, self.y + dy):
+                cells.append([self.x, self.y + 2 * dy])
+            return cells
+        else:
+            return self.get_attacked_cells(grid)
+            # TODO сделать рокировки для короля
+
     def can_move(self, x, y, grid):
         """Возвращает True, если фигуру можно переместить в эту пустую ячейку
         x, y - Координата ячейки
         grid - Игровое поле
         """
-        if self.kind == PAWN:
-            # Пешка
-            if self.x == x:
-                dy = -1 if self.is_white else 1
-                pawn_row = 6 if self.is_white else 1
-                return self.y + dy == y or self.y == pawn_row and not grid.get_piece(x, self.y + dy) and self.y + 2 * dy == y
-            else:
-                return False
-        else:
-            return [x, y] in self.get_attacked_cells(grid)
-            # TODO сделать рокировки для короля
+        return [x, y] in self.get_cells_to_move(grid)
 
     def can_attack(self, x, y, grid):
         """Возвращает True, если фигура может атаковать данную ячейку
         х, у - Координата ячейки
         grid - Игровое поле
         """
-        if self.kind == PAWN:
-            # Пешка
-            dy = -1 if self.is_white else 1
-            return self.y + dy == y and abs(self.x - x) == 1
-            # TODO сделать взятие на проходе
-        else:
-            return self.can_move(x, y, grid)
+        return [x, y] in self.get_attacked_cells(grid)
 
     def trace_directions(self, direction, grid, length=7):
         """Идем вдоль направлений от фигуры и возвращаем все клетки до первой встреченной фигуры
@@ -107,6 +104,7 @@ class ChessPiece:
         result = []
         if self.kind == PAWN:
             # Пешка
+            # TODO сделать взятие на проходе
             dy = -1 if self.is_white else 1
             result = [[self.x - 1, self.y + dy], [self.x + 1, self.y + dy]]
         elif self.kind == BISHOP:
