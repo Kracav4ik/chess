@@ -65,22 +65,9 @@ class ChessPiece:
                 return self.y + dy == y or self.y == pawn_row and not grid.get_piece(x, self.y + dy) and self.y + 2 * dy == y
             else:
                 return False
-        elif self.kind == KNIGHT:
-            # Конь
-            return abs(self.x - x) == 1 and abs(self.y - y) == 2 or abs(self.x - x) == 2 and abs(self.y - y) == 1
-        elif self.kind == BISHOP:
-            # Слон
-            return self.can_move_bishop(x, y, grid)
-        elif self.kind == ROOK:
-            # Ладья
-            return self.can_move_rook(x, y, grid)
-        elif self.kind == QUEEN:
-            # Ферзь
-            return self.can_move_bishop(x, y, grid) or self.can_move_rook(x, y, grid)
         else:
-            # Король
-            # TODO сделать рокировки
-            return abs(self.x - x) <= 1 and abs(self.y - y) <= 1
+            return [x, y] in self.get_attacked_cells(grid)
+            # TODO сделать рокировки для короля
 
     def can_attack(self, x, y, grid):
         """Возвращает True, если фигура может атаковать данную ячейку
@@ -94,40 +81,6 @@ class ChessPiece:
             # TODO сделать взятие на проходе
         else:
             return self.can_move(x, y, grid)
-
-    def can_move_bishop(self, x, y, grid):
-        """Возвращае True если на пути слона к точке (х, у) нет фигур
-        х, у - Координата ячейки
-        grid - Игровое поле
-        """
-        if abs(self.x - x) == abs(self.y - y):
-            diff = abs(self.x - x)
-            dx = 1 if self.x < x else -1
-            dy = 1 if self.y < y else -1
-            for cell in range(1, diff):
-                if grid.get_piece(self.x + dx * cell, self.y + dy * cell):
-                    return False
-            return True
-        return False
-
-    def can_move_rook(self, x, y, grid):
-        """Возвращае True если на пути ладьи к точке (х, у) нет фигур
-        х, у - Координата ячейки
-        grid - Игровое поле
-        """
-        if self.x == x:
-            step = 1 if self.y < y else -1
-            for cell_y in range(self.y + step, y, step):
-                if grid.get_piece(x, cell_y):
-                    return False
-            return True
-        elif self.y == y:
-            step = 1 if self.x < x else -1
-            for cell_x in range(self.x + step, x, step):
-                if grid.get_piece(cell_x, y):
-                    return False
-            return True
-        return False
 
     def trace_directions(self, direction, grid, length=7):
         """Идем вдоль направлений от фигуры и возвращаем все клетки до первой встреченной фигуры
