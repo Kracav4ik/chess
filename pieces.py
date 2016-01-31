@@ -47,6 +47,11 @@ class ChessPiece:
         screen.draw_rect(color, pix_x + pix_shift, pix_y + pix_shift, PIECE_SIZE, PIECE_SIZE)
         screen.draw_text(TEXT[self.kind], self.font, text_color, pix_x, pix_y, pix_size, pix_size)
 
+    def clone(self):
+        """Создает идентичную копию фигуры
+        """
+        return ChessPiece(self.kind, self.x, self.y, self.is_white)
+
     def can_move(self, x, y, grid):
         """Возвращает True, если фигуру можно переместить в эту пустую ячейку
         x, y - Координата ячейки

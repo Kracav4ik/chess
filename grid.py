@@ -3,11 +3,46 @@
 from __future__ import division
 import os.path
 import pygame
-from attack import AttackGrid
+from attack import AttackGrid, SimpleAttackGrid
 from pieces import ChessPiece, KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN
 
 HOVER_COLOR = [255, 255, 255]
 CHESS_GRID = 8
+
+
+class SimpleGrid:
+    """Упрощенное игровое поле, которое используется для расчета следующей позиции
+    """
+    def __init__(self, actual_grid):
+        """
+        :type actual_grid: Grid
+        """
+        self.pieces = [piece.clone() for piece in actual_grid.pieces]
+        self.active_piece = self.get_piece(actual_grid.active_piece.x, actual_grid.active_piece.y)
+        self.attack_grid = SimpleAttackGrid()
+
+    def get_piece(self, x, y):
+        """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет
+        x, y - ячейковые коор-ты
+        """
+        for piece in self.pieces:
+            if x == piece.x and y == piece.y:
+                return piece
+        return None
+
+    def place_active_piece_at(self, x, y):
+        """Ставит фигуру в ячейку и завершает ход
+        x, y - ячейковые коор-ты
+        """
+        self.active_piece.x = x
+        self.active_piece.y = y
+        self.refresh_attack_cells()
+
+    def refresh_attack_cells(self):
+        """Обновляет атакуемые клетки
+        """
+        for piece in self.pieces:
+            self.attack_grid.add_cells(piece.get_attacked_cells(self), piece.is_white)
 
 
 class Grid:
@@ -161,23 +196,28 @@ class Grid:
                 self.active_piece = None
             elif self.good_coords(x, y):
                 # нажатие было внутри игрового поля
+
+                # создаем фейковый грид чтобы проверить разрешенность хода
+                grid_copy = SimpleGrid(self)
+
                 if mouse_piece and mouse_piece.is_white != self.active_piece.is_white and self.active_piece.can_attack(x, y, self):
                     # двигаем в клетку, занятую фигурой
-                    self.pieces.remove(mouse_piece)
-                    self.place_active_piece_at(x, y)
+                    grid_copy.pieces.remove(grid_copy.get_piece(x, y))
+                    grid_copy.place_active_piece_at(x, y)
                 elif not mouse_piece and self.active_piece.can_move(x, y, self):
                     # двигаем в пустую клетку
-                    self.place_active_piece_at(x, y)
+                    grid_copy.place_active_piece_at(x, y)
+                else:
+                    # эта фигура не может так пойти
+                    return
 
-    def place_active_piece_at(self, x, y):
-        """Ставит фигуру в ячейку и завершает ход
-        x, y - ячейковые коор-ты
-        """
-        self.active_piece.x = x
-        self.active_piece.y = y
-        self.active_piece = None
-        self.is_whites_turn = not self.is_whites_turn
-        self.refresh_attack_cells()
+                # если ход не открывает короля под шах
+                if not self.king_under_attack(grid_copy.pieces, grid_copy.attack_grid, self.is_whites_turn):
+                    # совершаем ход
+                    self.pieces = grid_copy.pieces
+                    self.attack_grid.attacked_cells = grid_copy.attack_grid.attacked_cells
+                    self.active_piece = None
+                    self.is_whites_turn = not self.is_whites_turn
 
     def get_piece(self, x, y):
         """Принимает ячейковые коор-ты. Возвращает фигуру, которая находися в этой коор-те, либо None если фигуры нет

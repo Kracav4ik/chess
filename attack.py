@@ -10,6 +10,21 @@ class CellInfo:
         self.attacked_by_white = attacked_by_white
 
 
+class SimpleAttackGrid:
+    """Упрощенный объект с полями, которые атакованы фигурами; используется для расчета следующей позиции
+    """
+    def __init__(self):
+        self.attacked_cells = []
+
+    def add_cells(self, cells, is_white):
+        """Добавляет список коор-т ячеек к атакуемым ячейкам
+        cells - список коор-т ячеек
+        is_white - является ли атакующая фигура белой
+        """
+        for x, y in cells:
+            self.attacked_cells.append(CellInfo(x, y, is_white))
+
+
 class AttackGrid:
     """Поля, которые атакованы фигурами
     pix_x, pix_y - левый верхний угол
