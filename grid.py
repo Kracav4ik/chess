@@ -99,6 +99,20 @@ class Grid:
         # Рисуем фон
         screen.draw_texture(self.bg_texture, self.bg_x, self.bg_y, self.bg_size, self.bg_size)
 
+        # Рисуем клетки, атакованные фигурой под курсором мыши
+        # TODO: рисовать для фигуры под курсором линии, по которым она атакована?
+        attacked_color = [160, 64, 32, 192]
+        x, y = self.active_cell
+        piece = self.get_piece(x, y)
+        if piece is not None:
+            attacked_cells = piece.get_attacked_cells(self)
+            for x, y in attacked_cells:
+                if not self.good_coords(x, y):
+                    continue
+                pix_x = x * self.cell_size + self.offset_x + self.bg_x
+                pix_y = y * self.cell_size + self.offset_y + self.bg_y
+                screen.draw_rect(attacked_color, pix_x, pix_y, self.cell_size, self.cell_size)
+
         # Рисуем атакованные поля
         self.attack_grid.render(screen, self)
 
