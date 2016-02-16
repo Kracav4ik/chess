@@ -42,8 +42,13 @@ class AttackGrid:
         :type screen: screen.Screen
         :type grid: grid.Grid
         """
-        enemy_color = [255, 0, 0, 32]
-        friend_color = [0, 255, 0, 32]
+        width = self.cell_size // 2
+        height = self.cell_size // 2
+        white_attacked = {}
+        black_attacked = {}
+        font = screen.get_font('Arial Black', 20)
+        white_color = [255, 255, 255]
+        black_color = [0, 0, 0]
         for cell_info in self.attacked_cells:
             is_white = cell_info.attacked_by_white
             x = cell_info.x
@@ -52,24 +57,18 @@ class AttackGrid:
                 continue
             pix_x = x * self.cell_size + self.pix_x
             pix_y = y * self.cell_size + self.pix_y
-            attacked_by_enemy = grid.is_whites_turn != is_white
-            color = enemy_color if attacked_by_enemy else friend_color
-            gap = 4
-            border = 6
-            triangle_leg = self.cell_size - border
             if is_white:
-                points = [
-                    (pix_x + border,             pix_y + border + gap),
-                    (pix_x + border,             pix_y + triangle_leg),
-                    (pix_x + triangle_leg - gap, pix_y + triangle_leg)
-                ]
+                white_attacked[pix_x, pix_y] = white_attacked.get((pix_x, pix_y), 0) + 1
             else:
-                points = [
-                    (pix_x + border + gap, pix_y + border),
-                    (pix_x + triangle_leg, pix_y + border),
-                    (pix_x + triangle_leg, pix_y + triangle_leg - gap)
-                ]
-            screen.draw_polygon(color, points)
+                black_attacked[pix_x, pix_y] = black_attacked.get((pix_x, pix_y), 0) + 1
+
+        for pix_x, pix_y in white_attacked.keys():
+            text = str(white_attacked[pix_x, pix_y])
+            screen.draw_text(text, font, white_color, pix_x, pix_y + height, width, height)
+
+        for pix_x, pix_y in black_attacked.keys():
+            text = str(black_attacked[pix_x, pix_y])
+            screen.draw_text(text, font, black_color, pix_x + width, pix_y, width, height)
 
     def add_cells(self, cells, is_white):
         """Добавляет список коор-т ячеек к атакуемым ячейкам
