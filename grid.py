@@ -102,8 +102,11 @@ class Grid:
         # Рисуем клетки, атакованные фигурой под курсором мыши
         # TODO: рисовать для фигуры под курсором линии, по которым она атакована?
         attacked_color = [160, 64, 32, 192]
-        x, y = self.active_cell
-        piece = self.get_piece(x, y)
+        if self.active_piece is not None:
+            piece = self.active_piece
+        else:
+            x, y = self.active_cell
+            piece = self.get_piece(x, y)
         if piece is not None:
             attacked_cells = piece.get_attacked_cells(self)
             for x, y in attacked_cells:
