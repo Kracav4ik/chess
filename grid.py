@@ -4,7 +4,7 @@ from __future__ import division
 import os.path
 import pygame
 from attack import AttackGrid, SimpleAttackGrid
-from pieces import ChessPiece, KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN
+from pieces import King, Queen, Rook, Bishop, Knight, Pawn
 
 HOVER_COLOR = [255, 255, 255]
 CHESS_GRID = 8
@@ -72,10 +72,10 @@ class Grid:
 
         # Расставляем фигуры на доске
         for x in range(CHESS_GRID):
-            self.place_mirrored(PAWN, x, 1)
-        self.place_mirrored(KING, 4, 0)
-        self.place_mirrored(QUEEN, 3, 0)
-        for x, kind in enumerate([ROOK, KNIGHT, BISHOP]):
+            self.place_mirrored(Pawn, x, 1)
+        self.place_mirrored(King, 4, 0)
+        self.place_mirrored(Queen, 3, 0)
+        for x, kind in enumerate([Rook, Knight, Bishop]):
             self.place_mirrored(kind, x, 0)
             self.place_mirrored(kind, CHESS_GRID - 1 - x, 0)
 
@@ -83,14 +83,14 @@ class Grid:
 
         self.bg_texture = pygame.image.load(os.path.join('data', 'chessboard.png'))
 
-    def place_mirrored(self, kind, black_x, black_y):
+    def place_mirrored(self, piece_type, black_x, black_y):
         """Ставит черную фигуру в заданную ячейку, и зеркально ей ставит такую же белую фигуру.
         Используется для расстановки фигур в начальной позиции.
-        kind - Тип фигуры (Ферзь, король и т.д)
+        piece_type - Тип фигуры (Ферзь, король и т.д)
         black_x, black_y - Координаты ячейки для черной фигуры
         """
-        self.pieces.append(ChessPiece(kind, black_x, black_y, False))
-        self.pieces.append(ChessPiece(kind, black_x, CHESS_GRID - 1 - black_y, True))
+        self.pieces.append(piece_type(black_x, black_y, False))
+        self.pieces.append(piece_type(black_x, CHESS_GRID - 1 - black_y, True))
 
     def render(self, screen):
         """ Отрисовка игрового поля
@@ -307,7 +307,7 @@ class Grid:
         """
         king_figure = None
         for piece in pieces:
-            if piece.is_white == is_white_king and piece.kind == KING:
+            if piece.is_white == is_white_king and isinstance(piece, King):
                 king_figure = piece
         if king_figure is None:
             return True
