@@ -77,6 +77,21 @@ class ChessPieceBase:
 
 
 class King(ChessPieceBase):
+    def get_cells_to_move(self, grid):
+        cells = ChessPieceBase.get_cells_to_move(self, grid)
+
+        positions = [
+            (0, 2),  # ладья на позиции 0, рокировка переставит короля на позицию 2
+            (7, 6),  # ладья на позиции 7, рокировка переставит короля на позицию 6
+        ]
+        starting_row = 7 if self.is_white else 0
+        if self.x == 4 and self.y == starting_row:
+            for rook_x, castle_x in positions:
+                piece = grid.get_piece(rook_x, starting_row)
+                if isinstance(piece, Rook) and piece.is_white == self.is_white:
+                    cells += [[castle_x, starting_row]]
+        return cells
+
     def get_attacked_cells(self, grid):
         return self.trace_directions(hor_vert_moves + diagonal_moves, grid, 1)
 
