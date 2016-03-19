@@ -34,6 +34,16 @@ class SimpleGrid:
         """Ставит фигуру в ячейку и завершает ход
         x, y - ячейковые коор-ты
         """
+        if isinstance(self.active_piece, King) and abs(self.active_piece.x - x) == 2:
+            # рокировка, надо двигать ладью
+            if self.active_piece.x > x:
+                # длинная рокировка
+                rook = self.get_piece(0, self.active_piece.y)
+                rook.x = x + 1
+            else:
+                # короткая рокировка
+                rook = self.get_piece(7, self.active_piece.y)
+                rook.x = x - 1
         self.active_piece.x = x
         self.active_piece.y = y
         self.refresh_attack_cells()
