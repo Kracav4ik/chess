@@ -9,6 +9,14 @@ class CellInfo:
         self.y = y
         self.attacked_by_white = attacked_by_white
 
+    def __eq__(self, other):
+        if not isinstance(other, CellInfo):
+            return False
+        return self.x == other.x and self.y == other.y and self.attacked_by_white == other.attacked_by_white
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 class SimpleAttackGrid:
     """Упрощенный объект с полями, которые атакованы фигурами; используется для расчета следующей позиции

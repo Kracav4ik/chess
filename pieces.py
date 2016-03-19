@@ -2,6 +2,8 @@
 
 from __future__ import division
 
+from attack import CellInfo
+
 PIECE_SIZE = 48
 
 diagonal_moves = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
@@ -78,6 +80,9 @@ class ChessPieceBase:
 
 class King(ChessPieceBase):
     def get_cells_to_move(self, grid):
+        """
+        :type grid: grid.Grid
+        """
         cells = ChessPieceBase.get_cells_to_move(self, grid)
 
         positions = [
@@ -87,9 +92,26 @@ class King(ChessPieceBase):
         starting_row = 7 if self.is_white else 0
         if self.x == 4 and self.y == starting_row:
             for rook_x, castle_x in positions:
+                castle_allowed = True
                 piece = grid.get_piece(rook_x, starting_row)
                 if isinstance(piece, Rook) and piece.is_white == self.is_white:
-                    cells += [[castle_x, starting_row]]
+                    for x in range(min(rook_x, self.x) + 1, max(rook_x, self.x)):
+                        if grid.get_piece(x, starting_row):
+                            castle_allowed = False
+
+                    if self.x > rook_x:
+                        # длинная рокировка
+                        begin_x = rook_x + 2
+                        end_x = self.x + 1
+                    else:
+                        # короткая рокировка
+                        begin_x = self.x
+                        end_x = rook_x
+                    for x in range(begin_x, end_x):
+                        if CellInfo(x, starting_row, not piece.is_white) in grid.attack_grid.attacked_cells:
+                            castle_allowed = False
+                    if castle_allowed:
+                        cells += [[castle_x, starting_row]]
         return cells
 
     def get_attacked_cells(self, grid):
