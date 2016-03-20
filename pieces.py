@@ -11,15 +11,26 @@ knight_moves = [[2, 1], [1, 2], [-1, 2], [-2, 1], [-1, -2], [-2, -1], [1, -2], [
 hor_vert_moves = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
 
+_last_id = 0
+
+
+def _new_id():
+    global _last_id
+    _last_id += 1
+    return _last_id
+
+
 class ChessPieceBase:
     """Шахматная фигура
     x, y - Ячейковые коорд-ты (0 .. 7)
     is_white - True если фигура белая иначе False
+    id - уникальный идентификатор
     """
-    def __init__(self, x, y, is_white):
+    def __init__(self, x, y, is_white, piece_id=None):
         self.x = x
         self.y = y
         self.is_white = is_white
+        self.id = piece_id if piece_id is not None else _new_id()
 
     def render_at(self, screen, pix_x, pix_y, pix_size):
         """Рисует фигуру в указанной ячейке
@@ -37,7 +48,7 @@ class ChessPieceBase:
     def clone(self):
         """Создает идентичную копию фигуры
         """
-        return self.__class__(self.x, self.y, self.is_white)
+        return self.__class__(self.x, self.y, self.is_white, self.id)
 
     def get_cells_to_move(self, grid):
         return self.get_attacked_cells(grid)
@@ -110,6 +121,10 @@ class King(ChessPieceBase):
                     for x in range(begin_x, end_x):
                         if CellInfo(x, starting_row, not piece.is_white) in grid.attack_grid.attacked_cells:
                             castle_allowed = False
+
+                    if grid.game_history.is_piece_moved(self) or grid.game_history.is_piece_moved(piece):
+                        castle_allowed = False
+
                     if castle_allowed:
                         cells += [[castle_x, starting_row]]
         return cells

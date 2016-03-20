@@ -5,6 +5,7 @@ import os.path
 import pygame
 from attack import AttackGrid, SimpleAttackGrid
 from pieces import King, Queen, Rook, Bishop, Knight, Pawn
+from history import GameHistory
 
 HOVER_COLOR = [255, 255, 255]
 CHESS_GRID = 8
@@ -77,6 +78,7 @@ class Grid:
         self.active_shift = (0, 0)
         self.is_whites_turn = True
         self.attack_grid = AttackGrid(offset_x + bg_x, offset_y + bg_y, cell_size)
+        self.game_history = GameHistory()
         self.is_checkmate = False
         self.is_stalemate = False
 
@@ -249,6 +251,7 @@ class Grid:
                     # совершаем ход
                     self.pieces = grid_copy.pieces
                     self.attack_grid.attacked_cells = grid_copy.attack_grid.attacked_cells
+                    self.game_history.add_move(self.active_piece, x, y)
                     self.active_piece = None
                     self.is_whites_turn = not self.is_whites_turn
                     self.check_game_end()
